@@ -1,21 +1,43 @@
-#define _CRT_SECURE_NO_WARNINGS    //这一行不用加上，防止编译器报错的
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
+#include <math.h> // Used for fabs function
 
-int compare(const void* a, const void* b) {
-    double f = *(double*)a - *(double*)b;
-    if (f > 0) return 1;
-    if (f < 0) return -1;
-    return 0;
+// Quick sort function for sorting
+void quickSort(double arr[], int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
 }
 
+// partition function
+int partition(double arr[], int low, int high) {
+    double pivot = arr[high];
+    int i = (low - 1);
+    for (int j = low; j <= high - 1; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[i + 1], &arr[high]);
+    return (i + 1);
+}
+
+// Exchange function
+void swap(double* a, double* b) {
+    double t = *a;
+    *a = *b;
+    *b = t;
+}
+
+// The function for calculating the median
 double findMedian(double arr[], int n) {
-    qsort(arr, n, sizeof(double), compare);
+    quickSort(arr, 0, n - 1);
     if (n % 2 != 0)
         return (double)arr[n / 2];
-
     return (double)(arr[(n - 1) / 2] + arr[n / 2]) / 2.0;
 }
 
@@ -24,7 +46,7 @@ int main(void) {
 #define M 3
     double data[N][M];
 
-#define MAXCHAR 1000
+#define MAXCHAR 100
     char buffer[MAXCHAR];
     int row = 0;
     int column = 0;
@@ -41,7 +63,7 @@ int main(void) {
         column = 0;
         row++;
         if (row == 1) {
-            continue;
+            continue; // Skip Title Rows
         }
         char* value = strtok(buffer, ", ");
         while (value) {
@@ -53,11 +75,13 @@ int main(void) {
     fclose(fptr);
     fptr = NULL;
 
+    // Calculate the median of each column
     double medians[M];
     for (int i = 0; i < M; i++) {
         medians[i] = findMedian(data[i], N);
     }
 
+    // Format output result
     printf("%.2f,%.2f,%.2f\n", medians[0], medians[1], medians[2]);
 
     return EXIT_SUCCESS;
